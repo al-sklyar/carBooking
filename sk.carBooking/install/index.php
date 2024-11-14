@@ -1,26 +1,22 @@
 <?php
 
-use \Bitrix\Main\Localization\Loc;
-use \Bitrix\Main\Config\Option;
-use \Bitrix\Main\Loader;
-use \Bitrix\Main\Entity\Base;
-use \Bitrix\Main\Application;
-use SK\CarBooking\Entity\ComfortCategoryTable;
-use SK\CarBooking\Entity\PositionTable;
-use SK\CarBooking\Entity\PositionComfortCategoryTable;
-use SK\CarBooking\Entity\EmployeeTable;
-use SK\CarBooking\Entity\CarTable;
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Loader;
+use Bitrix\Highloadblock as HL;
+use Bitrix\Main\Entity\Base;
+use Bitrix\Main\Application;
 
 Loc::loadMessages(__FILE__);
 
 class sk_carBooking extends CModule
 {
-    private $entities = [
-        ComfortCategoryTable::class,
-        PositionTable::class,
-        PositionComfortCategoryTable::class,
-        EmployeeTable::class,
-        CarTable::class,
+    private $hlBlocks = [
+        'ComfortCategory' => 'sk_comfort_categories',
+        'Position' => 'sk_positions',
+        'PositionComfortCategory' => 'sk_position_comfort_categories',
+        'Employee' => 'sk_employees',
+        'Car' => 'sk_cars',
+        'Booking' => 'sk_booking',
     ];
 
     public function __construct()
@@ -37,71 +33,123 @@ class sk_carBooking extends CModule
 
         $this->PARTNER_NAME = Loc::getMessage("CAR_BOOKING_PARTNER_NAME");
         $this->PARTNER_URI = Loc::getMessage("CAR_BOOKING_PARTNER_URI");
-
-        $this->MODULE_SORT = 1;
-        $this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
-        $this->MODULE_GROUP_RIGHTS = "Y";
     }
 
-    // Определение пути
-    public function GetPath($notDocumentRoot = false)
+    public function doInstall()
     {
-        return $notDocumentRoot
-            ? str_ireplace(Application::getDocumentRoot(), '', dirname(__DIR__))
-            : dirname(__DIR__);
+        global $APPLICATION;
+
+        if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["install_test_data"])) {
+            $withTestData = $_POST["install_test_data"] === 'Y';
+        } else {
+            $APPLICATION->IncludeAdminFile(
+                Loc::getMessage("CAR_BOOKING_INSTALL_TITLE"),
+                $this->GetPath() . "/install/step1.php"
+            );
+            return;
+        }
+
+        if ($this->isVersionD7()) {
+            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
+            Loader::includeModule("highloadblock");
+            $this->createHLBlocks($withTestData);
+        } else {
+            $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_VERSION"));
+        }
     }
 
-    // Проверка поддержки D7
-    public function isVersionD7()
+    public function doUninstall()
     {
-        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '14.00.00');
+        global $APPLICATION;
+        $this->deleteHLBlocks();
+        \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
     }
 
-    // Создание таблиц
-    function InstallDB($withTestData = false)
+    protected function createHLBlocks($withTestData = false)
     {
-        Loader::includeModule($this->MODULE_ID);
+        foreach ($this->hlBlocks as $name => $table) {
+            $result = HL\HighloadBlockTable::add([
+                'NAME' => $name,
+                'TABLE_NAME' => $table,
+            ]);
 
-        foreach ($this->entities as $entity) {
-            if (class_exists($entity)) {
-                $entityInstance = Base::getInstance($entity);
-                $connection = $entityInstance->getConnection();
-                $tableName = $entityInstance->getDBTableName();
-
-                if (!$connection->isTableExists($tableName)) {
-                    $entityInstance->createDbTable();
-                }
+            if ($result->isSuccess()) {
+                $hlblockId = $result->getId();
+                $this->addHLBlockFields($name, $hlblockId);
             }
         }
 
-        // Опциональное заполнение тестовыми данными
         if ($withTestData) {
             $this->populateTestData();
         }
     }
 
-    // Удаление таблиц
-    function UnInstallDB()
+    protected function deleteHLBlocks()
     {
-        Loader::includeModule($this->MODULE_ID);
+        foreach ($this->hlBlocks as $name => $table) {
+            $hlblock = HL\HighloadBlockTable::getList([
+                'filter' => ['TABLE_NAME' => $table]
+            ])->fetch();
 
-        foreach ($this->entities as $entity) {
-            if (class_exists($entity)) {
-                $entityInstance = Base::getInstance($entity);
-                $connection = $entityInstance->getConnection();
-                $tableName = $entityInstance->getDBTableName();
-
-                if ($connection->isTableExists($tableName)) {
-                    $connection->queryExecute('DROP TABLE IF EXISTS ' . $tableName);
-                }
+            if ($hlblock) {
+                HL\HighloadBlockTable::delete($hlblock['ID']);
             }
         }
-
-        Option::delete($this->MODULE_ID);
     }
 
-    // Заполнение тестовыми данными
-    private function populateTestData()
+    protected function addHLBlockFields($name, $hlblockId)
+    {
+        $userTypeEntity = new \CUserTypeEntity();
+
+        $fields = [];
+        switch ($name) {
+            case 'ComfortCategory':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_NAME', 'USER_TYPE_ID' => 'string', 'MANDATORY' => 'Y']
+                ];
+                break;
+            case 'Position':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_POSITION_NAME', 'USER_TYPE_ID' => 'string', 'MANDATORY' => 'Y']
+                ];
+                break;
+            case 'PositionComfortCategory':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_POSITION_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_COMFORT_CATEGORY_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y']
+                ];
+                break;
+            case 'Employee':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_POSITION_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_ASSIGNED_CAR_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'N']
+                ];
+                break;
+            case 'Car':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_MODEL', 'USER_TYPE_ID' => 'string', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_COMFORT_CATEGORY_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_DRIVER', 'USER_TYPE_ID' => 'string', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_AVAILABILITY', 'USER_TYPE_ID' => 'boolean', 'MANDATORY' => 'Y']
+                ];
+                break;
+            case 'Booking':
+                $fields = [
+                    ['FIELD_NAME' => 'UF_EMPLOYEE_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_CAR_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_START_TIME', 'USER_TYPE_ID' => 'datetime', 'MANDATORY' => 'Y'],
+                    ['FIELD_NAME' => 'UF_END_TIME', 'USER_TYPE_ID' => 'datetime', 'MANDATORY' => 'Y']
+                ];
+                break;
+        }
+
+        foreach ($fields as $field) {
+            $field['ENTITY_ID'] = 'HLBLOCK_' . $hlblockId;
+            $userTypeEntity->Add($field);
+        }
+    }
+
+    protected function populateTestData()
     {
         $testData = include __DIR__ . '/testData.php';
 
@@ -114,36 +162,15 @@ class sk_carBooking extends CModule
         }
     }
 
-    public function doInstall()
+    public function isVersionD7()
     {
-        global $APPLICATION;
-
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["install_test_data"])) {
-        $withTestData = $_POST["install_test_data"] === 'Y';
-    } else {
-        $APPLICATION->IncludeAdminFile(
-            Loc::getMessage("CAR_BOOKING_INSTALL_TITLE"),
-            $this->GetPath() . "/install/step1.php"
-        );
-        return;
+        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '14.00.00');
     }
 
-        if ($this->isVersionD7()) {
-            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
-            $this->InstallDB($withTestData);
-        } else {
-            $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_VERSION"));
-        }
-    }
-
-    public function doUninstall()
+    public function GetPath($notDocumentRoot = false)
     {
-        global $APPLICATION;
-
-        // Удаляем таблицы
-        $this->UnInstallDB();
-
-        // Удаляем модуль
-        \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+        return $notDocumentRoot
+            ? str_ireplace(Application::getDocumentRoot(), '', dirname(__DIR__))
+            : dirname(__DIR__);
     }
 }

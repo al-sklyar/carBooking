@@ -2,48 +2,94 @@
 
 namespace SK\CarBooking\Entity;
 
-use Bitrix\Main\Entity;
+use Bitrix\Highloadblock as HL;
 use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
-class CarTable extends Entity\DataManager
+class CarTable
 {
-    public static function getTableName()
+    protected static $entity;
+
+    /**
+     * @return \Bitrix\Main\Entity\DataManager
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function getEntity()
     {
-        return 'sk_cars';
+        if (self::$entity === null) {
+            $hlblock = HL\HighloadBlockTable::getList([
+                'filter' => ['TABLE_NAME' => 'sk_cars']
+            ])->fetch();
+
+            if ($hlblock) {
+                self::$entity = HL\HighloadBlockTable::compileEntity($hlblock)->getDataClass();
+            } else {
+                throw new \Exception('Highload block sk_cars не найден');
+            }
+        }
+
+        return self::$entity;
     }
 
-    public static function getMap()
+    /**
+     * @param array $data
+     *
+     * @return \Bitrix\Main\Entity\AddResult
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function add(array $data)
     {
-        return [
-            new Entity\IntegerField('ID', [
-                'primary' => true,
-                'autocomplete' => true,
-                'title' => Loc::getMessage('CAR_ID'),
-            ]),
-            new Entity\StringField('MODEL', [
-                'required' => true,
-                'title' => Loc::getMessage('CAR_MODEL'),
-            ]),
-            new Entity\IntegerField('COMFORT_CATEGORY_ID', [
-                'required' => true,
-                'title' => Loc::getMessage('CAR_COMFORT_CATEGORY_ID'),
-            ]),
-            new Entity\StringField('DRIVER', [
-                'required' => true,
-                'title' => Loc::getMessage('CAR_DRIVER'),
-            ]),
-            new Entity\BooleanField('AVAILABILITY', [
-                'required' => true,
-                'values' => ['N', 'Y'],
-                'title' => Loc::getMessage('CAR_AVAILABILITY'),
-            ]),
-            new Entity\ReferenceField('COMFORT_CATEGORY', ComfortCategoryTable::class, [
-                '=this.COMFORT_CATEGORY_ID' => 'ref.ID'
-            ], [
-                'title' => Loc::getMessage('CAR_COMFORT_CATEGORY_REFERENCE')
-            ]),
-        ];
+        $entityDataClass = self::getEntity();
+        return $entityDataClass::add($data);
+    }
+
+    /**
+     * @param array $parameters
+     *
+     * @return \Bitrix\Main\DB\Result
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function getList(array $parameters = [])
+    {
+        $entityDataClass = self::getEntity();
+        return $entityDataClass::getList($parameters);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array|null
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function getById($id)
+    {
+        $entityDataClass = self::getEntity();
+        return $entityDataClass::getById($id)->fetch();
+    }
+
+    /**
+     * @param int   $id
+     * @param array $data
+     *
+     * @return \Bitrix\Main\Entity\UpdateResult
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function update($id, array $data)
+    {
+        $entityDataClass = self::getEntity();
+        return $entityDataClass::update($id, $data);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return \Bitrix\Main\Entity\DeleteResult
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function delete($id)
+    {
+        $entityDataClass = self::getEntity();
+        return $entityDataClass::delete($id);
     }
 }
