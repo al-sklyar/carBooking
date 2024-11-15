@@ -12,6 +12,35 @@ require $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.
 
 Loader::includeModule("highloadblock");
 
+// Явное подключение классов для совместимости
+Loader::registerAutoLoadClasses(null, [
+    'SK\CarBooking\Entity\ComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/ComfortCategoryTable.php',
+    'SK\CarBooking\Entity\PositionTable' => '/local/modules/sk.carBooking/lib/Entity/PositionTable.php',
+    'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
+    'SK\CarBooking\Entity\EmployeeTable' => '/local/modules/sk.carBooking/lib/Entity/EmployeeTable.php',
+    'SK\CarBooking\Entity\CarTable' => '/local/modules/sk.carBooking/lib/Entity/CarTable.php',
+    'SK\CarBooking\Entity\BookingTable' => '/local/modules/sk.carBooking/lib/Entity/BookingTable.php',
+]);
+
+function convertToDateTime($dateString)
+{
+    if (!empty($dateString)) {
+        try {
+            $date = strtotime($dateString);
+            if ($date === false) {
+                throw new \Exception("Ошибка преобразования даты: $dateString");
+            }
+
+            return \Bitrix\Main\Type\DateTime::createFromTimestamp($date);
+
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            return null;
+        }
+    }
+    return null;
+}
+
 $response = [];
 $employeeName = $_GET['employee_name'] ?? null;
 $startTime = $_GET['start_time'] ?? null;
@@ -50,7 +79,17 @@ if (empty($accessibleCategories)) {
     exit;
 }
 
-// Получаем автомобили
+// Преобразование дат
+$startDateTime = convertToDateTime($startTime);
+$endDateTime = convertToDateTime($endTime);
+
+if (!$startDateTime || !$endDateTime) {
+    $response['error'] = "Неверный формат даты/времени: $startTime или $endTime";
+    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
+// Получаем автомобили, соответствующие категории комфорта сотрудника
 $cars = CarTable::getList([
     'filter' => ['UF_COMFORT_CATEGORY_ID' => $accessibleCategories],
     'select' => ['ID', 'UF_MODEL', 'UF_DRIVER', 'UF_AVAILABILITY', 'UF_COMFORT_CATEGORY_ID']
@@ -68,14 +107,14 @@ $bookedCars = BookingTable::getList([
         [
             'LOGIC' => 'OR',
             [
-                '<=UF_START_TIME' => $endTime,
-        '>=UF_START_TIME' => $startTime,
+                '<=UF_START_TIME' => $endDateTime,
+                '>=UF_START_TIME' => $startDateTime,
             ],
             [
-        '<=UF_END_TIME' => $endTime,
-                '>=UF_END_TIME' => $startTime,
+                '<=UF_END_TIME' => $endDateTime,
+                '>=UF_END_TIME' => $startDateTime,
             ]
-        ],
+        ]
     ],
     'select' => ['UF_CAR_ID']
 ])->fetchAll();
@@ -84,7 +123,7 @@ $bookedCarIds = array_column($bookedCars, 'UF_CAR_ID');
 
 // Фильтруем свободные машины
 $availableCars = array_filter($cars, function ($car) use ($bookedCarIds) {
-    return $car['UF_AVAILABILITY'] === true && !in_array($car['ID'], $bookedCarIds);
+    return $car['UF_AVAILABILITY'] === "1" && !in_array($car['ID'], $bookedCarIds);
 });
 
 // Формируем ответ
