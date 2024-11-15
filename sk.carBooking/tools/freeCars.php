@@ -45,6 +45,7 @@ $response = [];
 $employeeName = $_GET['employee_name'] ?? null;
 $startTime = $_GET['start_time'] ?? null;
 $endTime = $_GET['end_time'] ?? null;
+$extended = ($_GET['extended'] ?? 'false') === 'true';
 
 // Проверяем наличие всех параметров
 if (!$employeeName || !$startTime || !$endTime) {
@@ -89,9 +90,14 @@ if (!$startDateTime || !$endDateTime) {
     exit;
 }
 
+// Определяем фильтр по категории
+$categoryFilter = $extended
+    ? ['>=UF_COMFORT_CATEGORY_ID' => $accessibleCategories]
+    : ['UF_COMFORT_CATEGORY_ID' => $accessibleCategories];
+
 // Получаем автомобили, соответствующие категории комфорта сотрудника
 $cars = CarTable::getList([
-    'filter' => ['UF_COMFORT_CATEGORY_ID' => $accessibleCategories],
+    'filter' => $categoryFilter,
     'select' => ['ID', 'UF_MODEL', 'UF_DRIVER', 'UF_AVAILABILITY', 'UF_COMFORT_CATEGORY_ID']
 ])->fetchAll();
 
