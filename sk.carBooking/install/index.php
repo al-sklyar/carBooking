@@ -39,9 +39,7 @@ class sk_carBooking extends CModule
     {
         global $APPLICATION;
 
-        // Проверяем, был ли выполнен step.php
         if (!isset($_REQUEST["step"])) {
-            // Переход на step.php
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("CAR_BOOKING_INSTALL_TITLE"),
                 $this->GetPath() . "/install/step.php"
@@ -149,6 +147,7 @@ class sk_carBooking extends CModule
                 break;
             case 'Employee':
                 $fields = [
+                    ['FIELD_NAME' => 'UF_NAME', 'USER_TYPE_ID' => 'string', 'MANDATORY' => 'Y'],
                     ['FIELD_NAME' => 'UF_POSITION_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'Y'],
                     ['FIELD_NAME' => 'UF_ASSIGNED_CAR_ID', 'USER_TYPE_ID' => 'integer', 'MANDATORY' => 'N']
                 ];
@@ -188,11 +187,21 @@ class sk_carBooking extends CModule
             'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
             'SK\CarBooking\Entity\EmployeeTable' => '/local/modules/sk.carBooking/lib/Entity/EmployeeTable.php',
             'SK\CarBooking\Entity\CarTable' => '/local/modules/sk.carBooking/lib/Entity/CarTable.php',
+            'SK\CarBooking\Entity\BookingTable' => '/local/modules/sk.carBooking/lib/Entity/BookingTable.php',
         ]);
 
         foreach ($testData as $entityClass => $records) {
+
             if (class_exists($entityClass)) {
                 foreach ($records as $record) {
+                    // Преобразуем формат даты/времени (используется в hl-блоке Booking)
+                    if (isset($record['UF_START_TIME'])) {
+                        $record['UF_START_TIME'] = new \Bitrix\Main\Type\DateTime($record['UF_START_TIME'], 'Y-m-d H:i:s');
+                    }
+                    if (isset($record['UF_END_TIME'])) {
+                        $record['UF_END_TIME'] = new \Bitrix\Main\Type\DateTime($record['UF_END_TIME'], 'Y-m-d H:i:s');
+                    }
+
                     $entityClass::add($record);
                 }
             }
