@@ -3,52 +3,54 @@ $testData = [
 
     // 'sk_comfort_categories'
     'SK\CarBooking\Entity\ComfortCategoryTable' => [
-        ['id' => 1, 'name' => 'Бизнес'],
-        ['id' => 2, 'name' => 'Комфорт'],
-        ['id' => 3, 'name' => 'Стандарт'],
+        ['UF_ID' => 1, 'UF_NAME' => 'Бизнес'],
+        ['UF_ID' => 2, 'UF_NAME' => 'Комфорт'],
+        ['UF_ID' => 3, 'UF_NAME' => 'Стандарт'],
     ],
 
     // 'sk_positions'
     'SK\CarBooking\Entity\PositionTable' => [
-        ['id' => 1, 'position_name' => 'Директор'],
-        ['id' => 2, 'position_name' => 'Заместитель директора'],
-        ['id' => 3, 'position_name' => 'Менеджер'],
-        ['id' => 4, 'position_name' => 'Старший специалист'],
-        ['id' => 5, 'position_name' => 'Младший специалист'],
-        ['id' => 6, 'position_name' => 'Консультант'],
+        ['UF_ID' => 1, 'UF_POSITION_NAME' => 'Директор'],
+        ['UF_ID' => 2, 'UF_POSITION_NAME' => 'Заместитель директора'],
+        ['UF_ID' => 3, 'UF_POSITION_NAME' => 'Менеджер'],
+        ['UF_ID' => 4, 'UF_POSITION_NAME' => 'Старший специалист'],
+        ['UF_ID' => 5, 'UF_POSITION_NAME' => 'Младший специалист'],
+        ['UF_ID' => 6, 'UF_POSITION_NAME' => 'Консультант'],
     ],
 
     // 'sk_position_comfort_categories'
     'SK\CarBooking\Entity\PositionComfortCategoryTable' => [
-        ['position_id' => 1, 'comfort_category_id' => 1], // Директор — 1 категория (Бизнес)
-        ['position_id' => 2, 'comfort_category_id' => 1], // Заместитель директора — 1 категория (Бизнес)
-        ['position_id' => 3, 'comfort_category_id' => 2], // Менеджер — 2 категория (Комфорт)
-        ['position_id' => 4, 'comfort_category_id' => 2], // Старший специалист — 2 категория (Комфорт)
-        ['position_id' => 5, 'comfort_category_id' => 3], // Младший специалист — 3 категория (Стандарт)
-        ['position_id' => 6, 'comfort_category_id' => 3], // Консультант — 3 категория (Стандарт)
+        ['UF_POSITION_ID' => 1, 'UF_COMFORT_CATEGORY_ID' => 1], // Директор — 1 категория (Бизнес)
+        ['UF_POSITION_ID' => 2, 'UF_COMFORT_CATEGORY_ID' => 1], // Заместитель директора — 1 категория (Бизнес)
+        ['UF_POSITION_ID' => 3, 'UF_COMFORT_CATEGORY_ID' => 2], // Менеджер — 2 категория (Комфорт)
+        ['UF_POSITION_ID' => 4, 'UF_COMFORT_CATEGORY_ID' => 2], // Старший специалист — 2 категория (Комфорт)
+        ['UF_POSITION_ID' => 5, 'UF_COMFORT_CATEGORY_ID' => 3], // Младший специалист — 3 категория (Стандарт)
+        ['UF_POSITION_ID' => 6, 'UF_COMFORT_CATEGORY_ID' => 3], // Консультант — 3 категория (Стандарт)
     ],
 
     // 'sk_employees'
     'SK\CarBooking\Entity\EmployeeTable' => [
-        ['name' => 'Иван Иванов', 'position_id' => 1], // Директор
-        ['name' => 'Петр Петров', 'position_id' => 2], // Заместитель директора
-        ['name' => 'Мария Сидорова', 'position_id' => 3], // Менеджер
-        ['name' => 'Ольга Смирнова', 'position_id' => 3], // Менеджер
-        ['name' => 'Анна Васильева', 'position_id' => 4], // Старший специалист
-        ['name' => 'Алексей Михайлов', 'position_id' => 4], // Старший специалист
-        ['name' => 'Владимир Попов', 'position_id' => 5], // Младший специалист
-        ['name' => 'Светлана Козлова', 'position_id' => 5], // Младший специалист
-        ['name' => 'Дмитрий Орлов', 'position_id' => 6], // Консультант
-        ['name' => 'Екатерина Павлова', 'position_id' => 6], // Консультант
+        ['UF_NAME' => 'Иван Иванов', 'UF_POSITION_ID' => 1], // Директор
+        ['UF_NAME' => 'Петр Петров', 'UF_POSITION_ID' => 2], // Заместитель директора
+        ['UF_NAME' => 'Мария Сидорова', 'UF_POSITION_ID' => 3], // Менеджер
+        ['UF_NAME' => 'Ольга Смирнова', 'UF_POSITION_ID' => 3], // Менеджер
+        ['UF_NAME' => 'Анна Васильева', 'UF_POSITION_ID' => 4], // Старший специалист
+        ['UF_NAME' => 'Алексей Михайлов', 'UF_POSITION_ID' => 4], // Старший специалист
+        ['UF_NAME' => 'Владимир Попов', 'UF_POSITION_ID' => 5], // Младший специалист
+        ['UF_NAME' => 'Светлана Козлова', 'UF_POSITION_ID' => 5], // Младший специалист
+        ['UF_NAME' => 'Дмитрий Орлов', 'UF_POSITION_ID' => 6], // Консультант
+        ['UF_NAME' => 'Екатерина Павлова', 'UF_POSITION_ID' => 6], // Консультант
     ],
 
     // 'sk_cars'
     'SK\CarBooking\Entity\CarTable' => [
-        ['model' => 'BMW 7 Series', 'comfort_category_id' => 1, 'driver' => 'Сергей Сергеев', 'availability' => true],
-        ['model' => 'Mercedes S-Class', 'comfort_category_id' => 1, 'driver' => 'Александр Куликов', 'availability' => true],
-        ['model' => 'Toyota Camry', 'comfort_category_id' => 2, 'driver' => 'Василий Федоров', 'availability' => true],
-        ['model' => 'Honda Accord', 'comfort_category_id' => 2, 'driver' => 'Геннадий Петров', 'availability' => true],
-        ['model' => 'Ford Focus', 'comfort_category_id' => 3, 'driver' => 'Михаил Волков', 'availability' => true],
-        ['model' => 'Hyundai Elantra', 'comfort_category_id' => 3, 'driver' => 'Игорь Соколов', 'availability' => true],
+        ['UF_MODEL' => 'BMW 7 Series', 'UF_COMFORT_CATEGORY_ID' => 1, 'UF_DRIVER' => 'Сергей Сергеев', 'UF_AVAILABILITY' => true],
+        ['UF_MODEL' => 'Mercedes S-Class', 'UF_COMFORT_CATEGORY_ID' => 1, 'UF_DRIVER' => 'Александр Куликов', 'UF_AVAILABILITY' => true],
+        ['UF_MODEL' => 'Toyota Camry', 'UF_COMFORT_CATEGORY_ID' => 2, 'UF_DRIVER' => 'Василий Федоров', 'UF_AVAILABILITY' => true],
+        ['UF_MODEL' => 'Honda Accord', 'UF_COMFORT_CATEGORY_ID' => 2, 'UF_DRIVER' => 'Геннадий Петров', 'UF_AVAILABILITY' => true],
+        ['UF_MODEL' => 'Ford Focus', 'UF_COMFORT_CATEGORY_ID' => 3, 'UF_DRIVER' => 'Михаил Волков', 'UF_AVAILABILITY' => true],
+        ['UF_MODEL' => 'Hyundai Elantra', 'UF_COMFORT_CATEGORY_ID' => 3, 'UF_DRIVER' => 'Игорь Соколов', 'UF_AVAILABILITY' => true],
     ],
 ];
+
+return $testData;
