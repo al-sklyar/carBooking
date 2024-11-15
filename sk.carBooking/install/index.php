@@ -51,7 +51,12 @@ class sk_carBooking extends CModule
 
         if ($this->isVersionD7()) {
             \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
-            Loader::includeModule("highloadblock");
+
+        if (!Loader::includeModule("highloadblock")) {
+            $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
+            return;
+        }
+
             $this->createHLBlocks($withTestData);
             $this->InstallFiles(); // используем явный вызов метода
         } else {
@@ -61,6 +66,12 @@ class sk_carBooking extends CModule
 
     public function doUninstall()
     {
+        global $APPLICATION;
+        if (!Loader::includeModule("highloadblock")) {
+            $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
+            return;
+        }
+
         $this->deleteHLBlocks();
         $this->UnInstallFiles();  // используем явный вызов метода
 
