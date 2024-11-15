@@ -39,15 +39,17 @@ class sk_carBooking extends CModule
     {
         global $APPLICATION;
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["install_test_data"])) {
-            $withTestData = $_POST["install_test_data"] === 'Y';
-        } else {
+        // Проверяем, был ли выполнен step.php
+        if (!isset($_REQUEST["step"])) {
+            // Переход на step.php
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("CAR_BOOKING_INSTALL_TITLE"),
-                $this->GetPath() . "/install/step1.php"
+                $this->GetPath() . "/install/step.php"
             );
             return;
         }
+
+        $withTestData = isset($_POST["install_test_data"]) && $_POST["install_test_data"] === 'Y';
 
         if ($this->isVersionD7()) {
             \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
@@ -58,9 +60,9 @@ class sk_carBooking extends CModule
         }
     }
 
+
     public function doUninstall()
     {
-        global $APPLICATION;
         $this->deleteHLBlocks();
         \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
     }
@@ -153,10 +155,22 @@ class sk_carBooking extends CModule
     {
         $testData = include __DIR__ . '/testData.php';
 
+        //модуль использует явное подключение классов для совместимости
+        Loader::registerAutoLoadClasses(null, [
+            'SK\CarBooking\Entity\ComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/ComfortCategoryTable.php',
+            'SK\CarBooking\Entity\PositionTable' => '/local/modules/sk.carBooking/lib/Entity/PositionTable.php',
+            'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
+            'SK\CarBooking\Entity\EmployeeTable' => '/local/modules/sk.carBooking/lib/Entity/EmployeeTable.php',
+            'SK\CarBooking\Entity\CarTable' => '/local/modules/sk.carBooking/lib/Entity/CarTable.php',
+        ]);
+
         foreach ($testData as $entityClass => $records) {
+            \Bitrix\Main\Diag\Debug::dumpToFile(class_exists($entityClass),date("Y-m-d H:i:s") . ' class_exists', '/logs/log1.txt');
             if (class_exists($entityClass)) {
                 foreach ($records as $record) {
-                    $entityClass::add($record);
+                $result = $entityClass::add($record);
+                \Bitrix\Main\Diag\Debug::dumpToFile($result->isSuccess(), date("Y-m-d H:i:s") . ' add result success', '/logs/log1.txt');
+                \Bitrix\Main\Diag\Debug::dumpToFile($result->getErrorMessages(), date("Y-m-d H:i:s") . ' add result errors', '/logs/log1.txt');
                 }
             }
         }
