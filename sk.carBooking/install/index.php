@@ -55,16 +55,42 @@ class sk_carBooking extends CModule
             \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
             Loader::includeModule("highloadblock");
             $this->createHLBlocks($withTestData);
+            $this->InstallFiles(); // используем явный вызов метода
         } else {
             $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_VERSION"));
         }
     }
 
-
     public function doUninstall()
     {
         $this->deleteHLBlocks();
+        $this->UnInstallFiles();  // используем явный вызов метода
+
         \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+    }
+
+    public function InstallFiles($arParams = [])
+    {
+        $sourceDir = $this->GetPath() . '/tools';
+        $targetDir = Application::getDocumentRoot() . '/local/tools';
+
+        if (\Bitrix\Main\IO\Directory::isDirectoryExists($sourceDir)) {
+            \Bitrix\Main\IO\Directory::createDirectory($targetDir);
+            CopyDirFiles($sourceDir, $targetDir, true, true);
+        }
+
+        return true;
+    }
+
+    public function UnInstallFiles()
+    {
+        $targetDir = Application::getDocumentRoot() . '/local/tools/freeCars.php';
+
+        if (\Bitrix\Main\IO\File::isFileExists($targetDir)) {
+            \Bitrix\Main\IO\File::deleteFile($targetDir);
+        }
+
+        return true;
     }
 
     protected function createHLBlocks($withTestData = false)
@@ -165,12 +191,9 @@ class sk_carBooking extends CModule
         ]);
 
         foreach ($testData as $entityClass => $records) {
-            \Bitrix\Main\Diag\Debug::dumpToFile(class_exists($entityClass),date("Y-m-d H:i:s") . ' class_exists', '/logs/log1.txt');
             if (class_exists($entityClass)) {
                 foreach ($records as $record) {
-                $result = $entityClass::add($record);
-                \Bitrix\Main\Diag\Debug::dumpToFile($result->isSuccess(), date("Y-m-d H:i:s") . ' add result success', '/logs/log1.txt');
-                \Bitrix\Main\Diag\Debug::dumpToFile($result->getErrorMessages(), date("Y-m-d H:i:s") . ' add result errors', '/logs/log1.txt');
+                    $entityClass::add($record);
                 }
             }
         }

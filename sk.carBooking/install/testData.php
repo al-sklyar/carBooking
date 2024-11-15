@@ -51,6 +51,13 @@ $testData = [
         ['UF_MODEL' => 'Ford Focus', 'UF_COMFORT_CATEGORY_ID' => 3, 'UF_DRIVER' => 'Михаил Волков', 'UF_AVAILABILITY' => true],
         ['UF_MODEL' => 'Hyundai Elantra', 'UF_COMFORT_CATEGORY_ID' => 3, 'UF_DRIVER' => 'Игорь Соколов', 'UF_AVAILABILITY' => true],
     ],
+
+    // 'sk_booking'
+    'SK\CarBooking\Entity\BookingTable' => [
+        ['UF_EMPLOYEE_ID' => 1, 'UF_CAR_ID' => 1, 'UF_START_TIME' => '2024-11-22 10:00:00', 'UF_END_TIME' => '2024-11-22 12:00:00'], // Иван Иванов бронирует BMW
+        ['UF_EMPLOYEE_ID' => 2, 'UF_CAR_ID' => 2, 'UF_START_TIME' => '2024-11-22 13:00:00', 'UF_END_TIME' => '2024-11-22 15:00:00'], // Петр Петров бронирует Mercedes
+        ['UF_EMPLOYEE_ID' => 3, 'UF_CAR_ID' => 3, 'UF_START_TIME' => '2024-11-22 11:00:00', 'UF_END_TIME' => '2024-11-22 14:00:00'], // Мария Сидорова бронирует Toyota
+    ]
 ];
 
 return $testData;
