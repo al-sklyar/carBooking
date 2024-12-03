@@ -52,12 +52,12 @@ class sk_carbooking extends CModule
             ModuleManager::registerModule($this->MODULE_ID);
 
             if (!Loader::includeModule("highloadblock")) {
-                $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
+                $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_HLBLOCK"));
                 return;
             }
 
             if (!Loader::includeModule($this->MODULE_ID)) {
-                $APPLICATION->ThrowException("Не удалось подключить модуль {$this->MODULE_ID}");
+                $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_MODULE", ["#MODULE_ID#" => $this->MODULE_ID]));
                 return;
             }
 
@@ -72,7 +72,7 @@ class sk_carbooking extends CModule
     {
         global $APPLICATION;
         if (!Loader::includeModule("highloadblock")) {
-            $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
+            $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_UNINSTALL_ERROR_HLBLOCK"));
             return;
         }
 
@@ -208,11 +208,15 @@ class sk_carbooking extends CModule
 
                     $result = $entityClass::add($record);
                     if (!$result->isSuccess()) {
-                        throw new \Exception("Ошибка добавления записи: " . implode(", ", $result->getErrorMessages()));
+                        throw new \Exception(
+                            Loc::getMessage("CAR_BOOKING_ERROR_ADD_RECORD") . implode(", ", $result->getErrorMessages())
+                        );
                     }
                 }
             } else {
-                throw new \Exception("Класс $entityClass не найден!");
+                throw new \Exception(
+                    Loc::getMessage("CAR_BOOKING_ERROR_CLASS_NOT_FOUND", ["#CLASS_NAME#" => $entityClass])
+                );
             }
         }
     }
