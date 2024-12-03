@@ -52,7 +52,7 @@ $employee = EmployeeTable::getList([
 ])->fetch();
 
 if (!$employee) {
-    $response['error'] = "Сотрудник с именем \"$employeeName\" не найден.";
+    $response['error'] = "Сотрудник с именем $employeeName не найден.";
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
@@ -66,7 +66,7 @@ $accessibleCategories = PositionComfortCategoryTable::getList([
 $accessibleCategories = array_column($accessibleCategories, 'UF_COMFORT_CATEGORY_ID');
 
 if (empty($accessibleCategories)) {
-    $response['error'] = "Для должности сотрудника \"$employeeName\" не заданы доступные категории автомобилей.";
+    $response['error'] = "Для должности сотрудника $employeeName не заданы доступные категории автомобилей.";
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
@@ -93,7 +93,7 @@ $cars = CarTable::getList([
 ])->fetchAll();
 
 if (!$cars) {
-    $response['error'] = "Для сотрудника \"$employeeName\" нет доступных автомобилей.";
+    $response['error'] = "Для сотрудника $employeeName нет доступных автомобилей.";
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
@@ -125,7 +125,7 @@ $availableCars = array_filter($cars, function ($car) use ($bookedCarIds) {
 
 // Формируем ответ
 if (!$availableCars) {
-    $response['error'] = "На указанное время нет свободных автомобилей для сотрудника \"$employeeName\".";
+    $response['error'] = "На указанное время нет свободных автомобилей для сотрудника $employeeName.";
 } else {
     $response['success'] = true;
     $response['cars'] = array_map(function ($car) {
