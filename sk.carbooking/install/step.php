@@ -18,7 +18,7 @@ if (!check_bitrix_sessid()) {
 <form action="<?= $APPLICATION->GetCurPage() ?>" method="post">
     <?= bitrix_sessid_post() ?>
     <input type="hidden" name="lang" value="<?= LANGUAGE_ID ?>">
-    <input type="hidden" name="id" value="sk.carBooking">
+    <input type="hidden" name="id" value="sk.carbooking">
     <input type="hidden" name="install" value="Y">
     <input type="hidden" name="step" value="2">
 

@@ -2,7 +2,7 @@
 
 use Bitrix\Main\Loader;
 
-Loader::registerAutoLoadClasses('sk.carBooking', [
+Loader::registerAutoLoadClasses('sk.carbooking', [
     'SK\CarBooking\Entity\AbstractHLBlockEntity' => 'lib/Entity/AbstractHLBlockEntity.php',
     'SK\CarBooking\Entity\ComfortCategoryTable' => 'lib/Entity/ComfortCategoryTable.php',
     'SK\CarBooking\Entity\PositionTable' => 'lib/Entity/PositionTable.php',

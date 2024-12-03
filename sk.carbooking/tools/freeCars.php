@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 require $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php";
 
 Loader::includeModule("highloadblock");
-Loader::includeModule("sk.carBooking");
+Loader::includeModule("sk.carbooking");
 
 function convertToDateTime($dateString)
 {

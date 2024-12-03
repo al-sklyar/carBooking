@@ -48,7 +48,6 @@ class sk_carbooking extends CModule
         }
 
         $withTestData = isset($_POST["install_test_data"]) && $_POST["install_test_data"] === 'Y';
-
         if ($this->isVersionD7()) {
             ModuleManager::registerModule($this->MODULE_ID);
 
@@ -58,11 +57,9 @@ class sk_carbooking extends CModule
             }
 
             if (!Loader::includeModule($this->MODULE_ID)) {
-                \Bitrix\Main\Diag\Debug::dumpToFile("Не удалось подключить модуль {$this->MODULE_ID}!!!!",date("Y-m-d H:i:s") . ' ', '/logs/log1.txt');
                 $APPLICATION->ThrowException("Не удалось подключить модуль {$this->MODULE_ID}");
                 return;
             }
-            \Bitrix\Main\Diag\Debug::dumpToFile("Модуль {$this->MODULE_ID} ПОДКЛЮЧЕН!",date("Y-m-d H:i:s") . ' ', '/logs/log1.txt');
 
             $this->createHLBlocks($withTestData);
             $this->InstallFiles();
