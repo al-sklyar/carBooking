@@ -2,13 +2,13 @@
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Loader;
+use Bitrix\Main\ModuleManager;
 use Bitrix\Highloadblock as HL;
-use Bitrix\Main\Entity\Base;
 use Bitrix\Main\Application;
 
 Loc::loadMessages(__FILE__);
 
-class sk_carBooking extends CModule
+class sk_carbooking extends CModule
 {
     private $hlBlocks = [
         'ComfortCategory' => 'sk_comfort_categories',
@@ -27,7 +27,7 @@ class sk_carBooking extends CModule
             $this->MODULE_VERSION = $arModuleVersion['VERSION'];
             $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
         }
-        $this->MODULE_ID = 'sk.carBooking';
+        $this->MODULE_ID = 'sk.carbooking';
         $this->MODULE_NAME = Loc::getMessage("CAR_BOOKING_MODULE_NAME");
         $this->MODULE_DESCRIPTION = Loc::getMessage("CAR_BOOKING_MODULE_DESCRIPTION");
 
@@ -50,15 +50,22 @@ class sk_carBooking extends CModule
         $withTestData = isset($_POST["install_test_data"]) && $_POST["install_test_data"] === 'Y';
 
         if ($this->isVersionD7()) {
-            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
+            ModuleManager::registerModule($this->MODULE_ID);
 
             if (!Loader::includeModule("highloadblock")) {
                 $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
                 return;
             }
 
+            if (!Loader::includeModule($this->MODULE_ID)) {
+                \Bitrix\Main\Diag\Debug::dumpToFile("Не удалось подключить модуль {$this->MODULE_ID}!!!!",date("Y-m-d H:i:s") . ' ', '/logs/log1.txt');
+                $APPLICATION->ThrowException("Не удалось подключить модуль {$this->MODULE_ID}");
+                return;
+            }
+            \Bitrix\Main\Diag\Debug::dumpToFile("Модуль {$this->MODULE_ID} ПОДКЛЮЧЕН!",date("Y-m-d H:i:s") . ' ', '/logs/log1.txt');
+
             $this->createHLBlocks($withTestData);
-            $this->InstallFiles(); // используем явный вызов метода
+            $this->InstallFiles();
         } else {
             $APPLICATION->ThrowException(Loc::getMessage("CAR_BOOKING_INSTALL_ERROR_VERSION"));
         }
@@ -73,9 +80,9 @@ class sk_carBooking extends CModule
         }
 
         $this->deleteHLBlocks();
-        $this->UnInstallFiles();  // используем явный вызов метода
+        $this->UnInstallFiles();
 
-        \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+        ModuleManager::unRegisterModule($this->MODULE_ID);
     }
 
     public function InstallFiles($arParams = [])
@@ -191,10 +198,6 @@ class sk_carBooking extends CModule
     {
         $testData = include __DIR__ . '/testData.php';
 
-        if (!Loader::includeModule($this->MODULE_ID)) {
-            throw new \Exception("Не удалось подключить модуль {$this->MODULE_ID} для загрузки тестовых данных");
-        }
-
         foreach ($testData as $entityClass => $records) {
             if (class_exists($entityClass)) {
                 foreach ($records as $record) {
@@ -214,7 +217,7 @@ class sk_carBooking extends CModule
 
     public function isVersionD7()
     {
-        return CheckVersion(\Bitrix\Main\ModuleManager::getVersion('main'), '14.00.00');
+        return CheckVersion(ModuleManager::getVersion('main'), '14.00.00');
     }
 
     public function GetPath($notDocumentRoot = false)
