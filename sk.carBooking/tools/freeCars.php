@@ -14,6 +14,7 @@ Loader::includeModule("highloadblock");
 
 // Явное подключение классов для совместимости
 Loader::registerAutoLoadClasses(null, [
+    'SK\CarBooking\Entity\AbstractHLBlockEntity' => '/local/modules/sk.carBooking/lib/Entity/AbstractHLBlockEntity.php',
     'SK\CarBooking\Entity\ComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/ComfortCategoryTable.php',
     'SK\CarBooking\Entity\PositionTable' => '/local/modules/sk.carBooking/lib/Entity/PositionTable.php',
     'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
