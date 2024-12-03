@@ -52,10 +52,10 @@ class sk_carBooking extends CModule
         if ($this->isVersionD7()) {
             \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
 
-        if (!Loader::includeModule("highloadblock")) {
-            $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
-            return;
-        }
+            if (!Loader::includeModule("highloadblock")) {
+                $APPLICATION->ThrowException("Не удалось подключить модуль highloadblock");
+                return;
+            }
 
             $this->createHLBlocks($withTestData);
             $this->InstallFiles(); // используем явный вызов метода
@@ -191,22 +191,14 @@ class sk_carBooking extends CModule
     {
         $testData = include __DIR__ . '/testData.php';
 
-        //модуль использует явное подключение классов для совместимости
-        Loader::registerAutoLoadClasses(null, [
-            'SK\CarBooking\Entity\AbstractHLBlockEntity' => '/local/modules/sk.carBooking/lib/Entity/AbstractHLBlockEntity.php',
-            'SK\CarBooking\Entity\ComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/ComfortCategoryTable.php',
-            'SK\CarBooking\Entity\PositionTable' => '/local/modules/sk.carBooking/lib/Entity/PositionTable.php',
-            'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
-            'SK\CarBooking\Entity\EmployeeTable' => '/local/modules/sk.carBooking/lib/Entity/EmployeeTable.php',
-            'SK\CarBooking\Entity\CarTable' => '/local/modules/sk.carBooking/lib/Entity/CarTable.php',
-            'SK\CarBooking\Entity\BookingTable' => '/local/modules/sk.carBooking/lib/Entity/BookingTable.php',
-        ]);
+        if (!Loader::includeModule($this->MODULE_ID)) {
+            throw new \Exception("Не удалось подключить модуль {$this->MODULE_ID} для загрузки тестовых данных");
+        }
 
         foreach ($testData as $entityClass => $records) {
-
             if (class_exists($entityClass)) {
                 foreach ($records as $record) {
-                    // Преобразуем формат даты/времени (используется в hl-блоке Booking)
+                    // Преобразуем формат даты/времени для hl-блока Booking
                     if (isset($record['UF_START_TIME'])) {
                         $record['UF_START_TIME'] = new \Bitrix\Main\Type\DateTime($record['UF_START_TIME'], 'Y-m-d H:i:s');
                     }

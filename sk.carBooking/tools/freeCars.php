@@ -11,17 +11,7 @@ header('Content-Type: application/json');
 require $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php";
 
 Loader::includeModule("highloadblock");
-
-// Явное подключение классов для совместимости
-Loader::registerAutoLoadClasses(null, [
-    'SK\CarBooking\Entity\AbstractHLBlockEntity' => '/local/modules/sk.carBooking/lib/Entity/AbstractHLBlockEntity.php',
-    'SK\CarBooking\Entity\ComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/ComfortCategoryTable.php',
-    'SK\CarBooking\Entity\PositionTable' => '/local/modules/sk.carBooking/lib/Entity/PositionTable.php',
-    'SK\CarBooking\Entity\PositionComfortCategoryTable' => '/local/modules/sk.carBooking/lib/Entity/PositionComfortCategoryTable.php',
-    'SK\CarBooking\Entity\EmployeeTable' => '/local/modules/sk.carBooking/lib/Entity/EmployeeTable.php',
-    'SK\CarBooking\Entity\CarTable' => '/local/modules/sk.carBooking/lib/Entity/CarTable.php',
-    'SK\CarBooking\Entity\BookingTable' => '/local/modules/sk.carBooking/lib/Entity/BookingTable.php',
-]);
+Loader::includeModule("sk.carBooking");
 
 function convertToDateTime($dateString)
 {
