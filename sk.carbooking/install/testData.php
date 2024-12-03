@@ -3,19 +3,19 @@ $testData = [
 
     // 'sk_comfort_categories'
     'SK\CarBooking\Entity\ComfortCategoryTable' => [
-        ['UF_ID' => 1, 'UF_NAME' => 'Бизнес'],
-        ['UF_ID' => 2, 'UF_NAME' => 'Комфорт'],
-        ['UF_ID' => 3, 'UF_NAME' => 'Стандарт'],
+        ['ID' => 1, 'UF_NAME' => 'Бизнес'],
+        ['ID' => 2, 'UF_NAME' => 'Комфорт'],
+        ['ID' => 3, 'UF_NAME' => 'Стандарт'],
     ],
 
     // 'sk_positions'
     'SK\CarBooking\Entity\PositionTable' => [
-        ['UF_ID' => 1, 'UF_POSITION_NAME' => 'Директор'],
-        ['UF_ID' => 2, 'UF_POSITION_NAME' => 'Заместитель директора'],
-        ['UF_ID' => 3, 'UF_POSITION_NAME' => 'Менеджер'],
-        ['UF_ID' => 4, 'UF_POSITION_NAME' => 'Старший специалист'],
-        ['UF_ID' => 5, 'UF_POSITION_NAME' => 'Младший специалист'],
-        ['UF_ID' => 6, 'UF_POSITION_NAME' => 'Консультант'],
+        ['ID' => 1, 'UF_POSITION_NAME' => 'Директор'],
+        ['ID' => 2, 'UF_POSITION_NAME' => 'Заместитель директора'],
+        ['ID' => 3, 'UF_POSITION_NAME' => 'Менеджер'],
+        ['ID' => 4, 'UF_POSITION_NAME' => 'Старший специалист'],
+        ['ID' => 5, 'UF_POSITION_NAME' => 'Младший специалист'],
+        ['ID' => 6, 'UF_POSITION_NAME' => 'Консультант'],
     ],
 
     // 'sk_position_comfort_categories'

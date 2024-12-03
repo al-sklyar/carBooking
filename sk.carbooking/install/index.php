@@ -206,11 +206,17 @@ class sk_carbooking extends CModule
                         $record['UF_END_TIME'] = new \Bitrix\Main\Type\DateTime($record['UF_END_TIME'], 'Y-m-d H:i:s');
                     }
 
-                    $entityClass::add($record);
+                    $result = $entityClass::add($record);
+                    if (!$result->isSuccess()) {
+                        throw new \Exception("Ошибка добавления записи: " . implode(", ", $result->getErrorMessages()));
+                    }
                 }
+            } else {
+                throw new \Exception("Класс $entityClass не найден!");
             }
         }
     }
+
 
     public function isVersionD7()
     {

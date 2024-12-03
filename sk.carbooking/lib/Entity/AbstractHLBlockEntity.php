@@ -1,4 +1,5 @@
 <?php
+
 namespace SK\CarBooking\Entity;
 
 use Bitrix\Highloadblock as HL;
@@ -6,18 +7,19 @@ use Bitrix\Main\SystemException;
 
 abstract class AbstractHLBlockEntity
 {
-    protected static $entity;
+    protected static array $entities = [];
     protected static string $tableName;
 
     /**
      * Получение скомпилированной сущности HL-блока
      *
-     * @return \Bitrix\Main\Entity\DataManager
+     * @return string
      * @throws \Exception
      */
-    public static function getEntity(): \Bitrix\Main\Entity\DataManager
+    public static function getEntity(): string
     {
-        if (self::$entity === null) {
+        $class = static::class;
+        if (!isset(self::$entities[$class])) {
             if (empty(static::$tableName)) {
                 throw new \Exception("Имя таблицы HL-блока не задано.");
             }
@@ -27,19 +29,20 @@ abstract class AbstractHLBlockEntity
             ])->fetch();
 
             if ($hlblock) {
-                self::$entity = HL\HighloadBlockTable::compileEntity($hlblock)->getDataClass();
+                self::$entities[$class] = HL\HighloadBlockTable::compileEntity($hlblock)->getDataClass();
             } else {
                 throw new \Exception("Highload block " . static::$tableName . " не найден");
             }
         }
 
-        return self::$entity;
+        return self::$entities[$class];
     }
 
     /**
      * Добавление записи
      *
      * @param array $data
+     *
      * @return \Bitrix\Main\Entity\AddResult
      * @throws \Bitrix\Main\SystemException
      */
@@ -53,6 +56,7 @@ abstract class AbstractHLBlockEntity
      * Получение списка записей
      *
      * @param array $parameters
+     *
      * @return \Bitrix\Main\DB\Result
      * @throws \Bitrix\Main\SystemException
      */
@@ -66,6 +70,7 @@ abstract class AbstractHLBlockEntity
      * Получение записи по ID
      *
      * @param int $id
+     *
      * @return array|null
      * @throws \Bitrix\Main\SystemException
      */
@@ -78,8 +83,9 @@ abstract class AbstractHLBlockEntity
     /**
      * Обновление записи
      *
-     * @param int $id
+     * @param int   $id
      * @param array $data
+     *
      * @return \Bitrix\Main\Entity\UpdateResult
      * @throws \Bitrix\Main\SystemException
      */
@@ -93,6 +99,7 @@ abstract class AbstractHLBlockEntity
      * Удаление записи
      *
      * @param int $id
+     *
      * @return \Bitrix\Main\Entity\DeleteResult
      * @throws \Bitrix\Main\SystemException
      */
