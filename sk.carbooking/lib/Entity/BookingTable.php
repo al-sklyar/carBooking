@@ -4,5 +4,5 @@ namespace SK\CarBooking\Entity;
 
 class BookingTable extends AbstractHLBlockEntity
 {
-    protected static $tableName = 'sk_booking';
+    protected static string $tableName = 'sk_booking';
 }

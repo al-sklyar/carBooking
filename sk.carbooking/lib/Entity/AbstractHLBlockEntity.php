@@ -7,7 +7,7 @@ use Bitrix\Main\SystemException;
 abstract class AbstractHLBlockEntity
 {
     protected static $entity;
-    protected static $tableName;
+    protected static string $tableName;
 
     /**
      * Получение скомпилированной сущности HL-блока
@@ -15,7 +15,7 @@ abstract class AbstractHLBlockEntity
      * @return \Bitrix\Main\Entity\DataManager
      * @throws \Exception
      */
-    public static function getEntity()
+    public static function getEntity(): \Bitrix\Main\Entity\DataManager
     {
         if (self::$entity === null) {
             if (empty(static::$tableName)) {
@@ -43,7 +43,7 @@ abstract class AbstractHLBlockEntity
      * @return \Bitrix\Main\Entity\AddResult
      * @throws \Bitrix\Main\SystemException
      */
-    public static function add(array $data)
+    public static function add(array $data): \Bitrix\Main\Entity\AddResult
     {
         $entityDataClass = self::getEntity();
         return $entityDataClass::add($data);
@@ -56,7 +56,7 @@ abstract class AbstractHLBlockEntity
      * @return \Bitrix\Main\DB\Result
      * @throws \Bitrix\Main\SystemException
      */
-    public static function getList(array $parameters = [])
+    public static function getList(array $parameters = []): \Bitrix\Main\DB\Result
     {
         $entityDataClass = self::getEntity();
         return $entityDataClass::getList($parameters);
@@ -69,7 +69,7 @@ abstract class AbstractHLBlockEntity
      * @return array|null
      * @throws \Bitrix\Main\SystemException
      */
-    public static function getById($id)
+    public static function getById($id): ?array
     {
         $entityDataClass = self::getEntity();
         return $entityDataClass::getById($id)->fetch();
@@ -83,7 +83,7 @@ abstract class AbstractHLBlockEntity
      * @return \Bitrix\Main\Entity\UpdateResult
      * @throws \Bitrix\Main\SystemException
      */
-    public static function update($id, array $data)
+    public static function update($id, array $data): \Bitrix\Main\Entity\UpdateResult
     {
         $entityDataClass = self::getEntity();
         return $entityDataClass::update($id, $data);
@@ -96,9 +96,19 @@ abstract class AbstractHLBlockEntity
      * @return \Bitrix\Main\Entity\DeleteResult
      * @throws \Bitrix\Main\SystemException
      */
-    public static function delete($id)
+    public static function delete($id): \Bitrix\Main\Entity\DeleteResult
     {
         $entityDataClass = self::getEntity();
         return $entityDataClass::delete($id);
+    }
+
+    /**
+     * Возвращает имя таблицы HL-блока.
+     *
+     * @return string
+     */
+    public static function getTableName(): string
+    {
+        return static::$tableName;
     }
 }
