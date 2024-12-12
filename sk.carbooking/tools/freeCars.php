@@ -104,6 +104,10 @@ $bookedCars = BookingTable::getList([
         [
             'LOGIC' => 'OR',
             [
+                '<=UF_START_TIME' => $startDateTime,
+                '>=UF_END_TIME' => $endDateTime,
+            ],
+            [
                 '<=UF_START_TIME' => $endDateTime,
                 '>=UF_START_TIME' => $startDateTime,
             ],
